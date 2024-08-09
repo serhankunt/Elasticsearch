@@ -65,7 +65,12 @@ public class ProductRepository
         );
 
         return response.IsValid;
+    }
 
+    public async Task<DeleteResponse> DeleteAsync(string id)
+    {
+        var response = await _client.DeleteAsync<Product>(id, x => x.Index(indexName));
 
+        return response;
     }
 }

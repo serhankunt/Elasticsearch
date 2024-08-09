@@ -28,6 +28,12 @@ public class ProductsController : BaseController
             await _productService.UpdateAsync(request));
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteById(string id)
+    {
+        return CreateActionResult(await _productService.DeleteAsync(id));
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {

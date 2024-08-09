@@ -1,5 +1,6 @@
 ﻿using Elasticsearch.API.DTOs;
 using Elasticsearch.API.Repository;
+using Nest;
 using System.Net;
 
 namespace Elasticsearch.API.Services;
@@ -7,10 +8,12 @@ namespace Elasticsearch.API.Services;
 public class ProductService
 {
     private readonly ProductRepository _productRepository;
+    private readonly ILogger<ProductService> _logger;
 
-    public ProductService(ProductRepository productRepository)
+    public ProductService(ProductRepository productRepository, ILogger<ProductService> logger)
     {
         _productRepository = productRepository;
+        _logger = logger;
     }
     public async Task<ResponseDto<ProductDto>> SaveAsync(ProductCreateDto request)
     {
@@ -68,6 +71,24 @@ public class ProductService
         if (!isSuccess)
         {
             return ResponseDto<bool>.Fail(new List<string> { "Update sırasında bir hata meydana geldi." }, HttpStatusCode.InternalServerError);
+        }
+
+        return ResponseDto<bool>.Success(true, HttpStatusCode.NoContent);
+    }
+
+    public async Task<ResponseDto<bool>> DeleteAsync(string id)
+    {
+        var deleteResponse = await _productRepository.DeleteAsync(id);
+
+        if (!deleteResponse.IsValid && deleteResponse.Result == Result.NotFound)
+        {
+            return ResponseDto<bool>.Fail(new List<string> { "Silmeye çalıştığınız ürün bulunamadı." }, HttpStatusCode.NotFound);
+        }
+
+        if (!deleteResponse.IsValid)
+        {
+            _logger.LogError(deleteResponse.OriginalException, deleteResponse.ServerError.Error.ToString());
+            return ResponseDto<bool>.Fail(new List<string> { "Silme sırasında bir hata meydana geldi." }, HttpStatusCode.InternalServerError);
         }
 
         return ResponseDto<bool>.Success(true, HttpStatusCode.NoContent);
