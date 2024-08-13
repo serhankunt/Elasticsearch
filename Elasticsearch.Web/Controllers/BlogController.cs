@@ -1,4 +1,5 @@
-﻿using Elasticsearch.Web.Services;
+﻿using Elasticsearch.Web.Models;
+using Elasticsearch.Web.Services;
 using Elasticsearch.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +11,21 @@ public class BlogController : Controller
     public BlogController(BlogService blogService)
     {
         _blogService = blogService;
+    }
+
+    public IActionResult Search()
+    {
+        return View(new List<Blog>());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Search(string searchText)
+    {
+        ViewBag.SearchText = searchText;
+
+        var blogList = await _blogService.SearchAsync(searchText);
+
+        return View(blogList);
     }
 
     public IActionResult Save()
@@ -30,4 +46,6 @@ public class BlogController : Controller
         TempData["result"] = "Kayıt başarılı";
         return RedirectToAction(nameof(BlogController.Save));
     }
+
+
 }
