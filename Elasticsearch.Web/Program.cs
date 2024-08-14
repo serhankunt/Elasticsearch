@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch;
 using Elasticsearch.Web.Extensions;
 using Elasticsearch.Web.Repository;
 using Elasticsearch.Web.Services;
@@ -10,6 +11,9 @@ builder.Services.AddElastic(builder.Configuration);
 
 builder.Services.AddScoped<BlogRepository>();
 builder.Services.AddScoped<BlogService>();
+builder.Services.AddScoped<ECommerceRepository>();
+builder.Services.AddScoped<ECommerceService>();
+builder.Services.AddScoped<ElasticsearchClient>();
 
 var app = builder.Build();
 
